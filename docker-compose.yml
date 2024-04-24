@@ -1,27 +1,91 @@
-version: '1'
+version: '3.9'
 services:
-  auth-service:
-    build: auth-service
-    container_name: auth-service-container
-    ports:
-      - "8081:8081"
-  product-service:
-    build: ./product-service
-    container_name: product-service-container
-    ports:
-      - "8082:8082"
-  order-service:
-    build: ./order-service
-    container_name: order-service-container
-    ports:
-      - "8083:8083"
-  review-service:
-    build: ./review-service
-    container_name: review-service-container
-    ports:
-      - "8084:8084"
+  # API-шлюз
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway-container
     ports:
       - "8080:8080"
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - review-service
+  # Аутентификация
+  auth-service:
+    build: auth-service
+    container_name: auth-service-container
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/authdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
+  # Продукты
+  product-service:
+    build: ./product-service
+    container_name: product-service-container
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://products-db:5432/productsdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
+  # Заказы
+  order-service:
+    build: ./order-service
+    container_name: order-service-container
+    ports:
+      - "8083:8083"
+    depends_on:
+      - auth
+      - products
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://orders-db:5432/ordersdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
+  # Отзывы
+  review-service:
+    build: ./review-service
+    container_name: review-service-container
+    ports:
+      - "8084:8084"
+    depends_on:
+      - auth
+      - products
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://reviews-db:5432/reviewsdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
+  # Базы данных PostgreSQL
+  auth-db:
+    image: postgres:14.0
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_INITDB_ARGS: "--username postgres --password password"
+
+  products-db:
+    image: postgres:14.0
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_INITDB_ARGS: "--username postgres --password password"
+
+  orders-db:
+    image: postgres:14.0
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_INITDB_ARGS: "--username postgres --password password"
+
+  reviews-db:
+    image: postgres:14.0
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_INITDB_ARGS: "--username postgres --password password"
