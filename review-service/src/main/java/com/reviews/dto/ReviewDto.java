@@ -1,5 +1,6 @@
 package com.reviews.dto;
 
+import java.util.Date;
 import java.util.UUID;
 
 public record ReviewDto(
@@ -7,6 +8,7 @@ public record ReviewDto(
     UUID userId,
     UUID productId,
     String content,
-    int rating) {
+    int rating,
+    Date date) {
 
 }

@@ -26,6 +26,7 @@ public class ReviewControllerImpl implements ReviewController {
 
   @Override
   @PostMapping("/reviews")
+  @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<Review> saveReview(@RequestBody Review review) {
     return ResponseEntity.ok(reviewService.createReview(review));
   }
@@ -46,6 +47,7 @@ public class ReviewControllerImpl implements ReviewController {
 
   @Override
   @GetMapping(value = {"/reviews/{productId}","reviews/{productId}/{amount}"})
+  @ResponseStatus(HttpStatus.OK)
   public List<Review> getReviews(@PathVariable("productId") UUID productId, @PathVariable(value = "amount") Optional<Integer> amount){
     if(amount.isPresent()){
       return reviewService.getReviewsByProductId(productId, amount.get());

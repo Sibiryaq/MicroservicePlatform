@@ -14,4 +14,5 @@ public interface ReviewRepository extends JpaRepository<Review, UUID>, CustomRev
   @Query("update Review r set r.content = ?2, r.rating = ?3 where r.reviewId = ?1")
   void setReviewInfoById(UUID reviewId, String content, int rating);
 
+  boolean existsByProductId(UUID productId);
 }
