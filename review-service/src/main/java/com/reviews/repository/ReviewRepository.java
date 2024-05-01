@@ -15,4 +15,5 @@ public interface ReviewRepository extends JpaRepository<Review, UUID>, CustomRev
   void setReviewInfoById(UUID reviewId, String content, int rating);
 
   boolean existsByProductId(UUID productId);
+  boolean existsByReviewIdAndUserId(UUID reviewId, UUID userId);
 }

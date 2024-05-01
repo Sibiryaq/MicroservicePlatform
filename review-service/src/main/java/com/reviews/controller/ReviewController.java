@@ -1,6 +1,6 @@
 package com.reviews.controller;
 
-import com.reviews.entity.Review;
+import com.reviews.dto.ReviewDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,12 +29,16 @@ public interface ReviewController {
               description = "Review successfully added"
           ),
           @ApiResponse(
+              responseCode = "409",
+              description = "Review with this UUID already exists"
+          ),
+          @ApiResponse(
               responseCode = "500",
               description = "Internal server error"
           )
       }
   )
-  ResponseEntity<Review> saveReview(@RequestBody Review review);
+  void saveReview(@RequestBody ReviewDto reviewDto);
 
   @PutMapping("/reviews")
   @Operation(
@@ -58,7 +61,7 @@ public interface ReviewController {
           )
       }
   )
-  void updateReview(@RequestBody Review review);
+  void updateReview(@RequestBody ReviewDto reviewDto);
 
   @DeleteMapping("/reviews/{id}")
   @Operation(
@@ -100,5 +103,5 @@ public interface ReviewController {
           )
       }
   )
-  List<Review> getReviews(@PathVariable("productId") UUID productId, @PathVariable(value = "amount") Optional<Integer> amount);
+  List<ReviewDto> getReviews(@PathVariable("productId") UUID productId, @PathVariable(value = "amount") Optional<Integer> amount);
 }
