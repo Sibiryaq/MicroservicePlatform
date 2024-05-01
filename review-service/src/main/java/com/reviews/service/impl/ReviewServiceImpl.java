@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -73,7 +76,9 @@ public class ReviewServiceImpl implements ReviewService {
   public List<ReviewDto> getReviewsByProductId(UUID productId, int count) {
     boolean answer = reviewRepository.existsByProductId(productId);
     if(answer) {
-      return reviewRepository.getReviewsLimited(productId, count).stream()
+      Pageable pageable = PageRequest.of(0,count);
+      Page<Review> page = reviewRepository.findByProductIdOrderByDateDesc(productId,pageable);
+      return page.getContent().stream()
           .map(this::convertReviewToReviewDto)
           .toList();
     } else {
