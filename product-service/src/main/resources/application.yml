@@ -1,13 +1,13 @@
 server:
-  port: 8083
+  port: 8082
   servlet:
     context-path: /product-service
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres1
+    url: jdbc:postgresql://localhost:5430/productdb
     username: postgres
-    password: 6706598
+    password: postgres
   jpa:
     show-sql: true
     properties:

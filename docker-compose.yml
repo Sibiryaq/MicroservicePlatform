@@ -1,91 +1,108 @@
 version: '3.9'
 services:
-  # API-шлюз
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway-container
-    ports:
-      - "8080:8080"
-    depends_on:
-      - auth-service
-      - product-service
-      - order-service
-      - review-service
-  # Аутентификация
-  auth-service:
-    build: auth-service
-    container_name: auth-service-container
-    ports:
-      - "8081:8081"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/authdb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
 
-  # Продукты
+  productdb:
+    image: postgres:latest
+    container_name: product-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=productdb
+    expose:
+      - 5430
+    ports:
+      - 5430:5432
+    restart: always
+
+  order-db:
+    image: postgres:latest
+    container_name: order-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=order-db
+    expose:
+      - 5435
+    ports:
+      - 5435:5432
+    restart: always
+
+  auth-db:
+    image: postgres:latest
+    container_name: auth-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=auth-db
+    expose:
+      - 5434
+    ports:
+      - 5434:5432
+    restart: always
+
+  reviewdb:
+    image: postgres:latest
+    container_name: review-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=reviewdb
+    expose:
+      - 5433
+    ports:
+      - 5433:5432
+    restart: always
+
+  #product
   product-service:
     build: ./product-service
-    container_name: product-service-container
-    ports:
-      - "8082:8082"
+    container_name: product-service
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://products-db:5432/productsdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://productdb:5432/productdb
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - 8080:8080
 
-  # Заказы
+  #Auth
+  auth-service:
+    build: ./auth-service
+    container_name: auth-container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth-db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - 8081:8080
+
+  #Order
   order-service:
     build: ./order-service
-    container_name: order-service-container
-    ports:
-      - "8083:8083"
-    depends_on:
-      - auth
-      - products
+    container_name: order-service
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://orders-db:5432/ordersdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/order-db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - 8082:8080
 
   # Отзывы
   review-service:
     build: ./review-service
     container_name: review-service-container
-    ports:
-      - "8084:8084"
-    depends_on:
-      - auth
-      - products
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://reviews-db:5432/reviewsdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://reviewdb:5432/reviewdb
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - 8000:8080
 
-  # Базы данных PostgreSQL
-  auth-db:
-    image: postgres:14.0
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_INITDB_ARGS: "--username postgres --password password"
+  api-gateway:
+    ports:
+      - "8090:8090"
+    build: ./api-gateway
+    container_name: api-gateway-container
 
-  products-db:
-    image: postgres:14.0
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_INITDB_ARGS: "--username postgres --password password"
-
-  orders-db:
-    image: postgres:14.0
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_INITDB_ARGS: "--username postgres --password password"
-
-  reviews-db:
-    image: postgres:14.0
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_INITDB_ARGS: "--username postgres --password password"
+networks:
+  db:
+    driver: bridge

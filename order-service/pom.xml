@@ -11,7 +11,7 @@
     <groupId>ru.aston</groupId>
     <artifactId>order-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>reviewsService</name>
+    <name>orderService</name>
     <description>reviews-Service microservice</description>
     <properties>
         <java.version>17</java.version>
